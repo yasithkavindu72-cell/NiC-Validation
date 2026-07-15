@@ -1,0 +1,26 @@
+# Node dependencies
+**/node_modules/
+
+# Secret environment files
+**/.env
+**/.env.local
+**/.env.development
+**/.env.production
+
+# Build folders
+**/dist/
+**/build/
+
+# Uploaded and temporary files
+**/uploads/
+**/temp/
+
+# Log files
+*.log
+npm-debug.log*
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
