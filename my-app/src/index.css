@@ -1396,6 +1396,18 @@ body {
   }
 }
 
+.upload-page .upload-main {
+  width: calc(100% - 260px);
+  margin-left: 260px;
+}
+
+@media (max-width: 850px) {
+  .upload-page .upload-main {
+    width: 100%;
+    margin-left: 0;
+  }
+}
+
 
 .records-page {
   min-height: 100vh;

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Sidebar from "./Pages/Slidebar";
 
 
 const API_URL =
@@ -7,11 +8,13 @@ const API_URL =
 
 const MAX_FILES = 4;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+const shouldRenderOldUploadSidebar = false;
 
 function Upload() {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [files, setFiles] = useState([]);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("");
@@ -207,7 +210,20 @@ navigate("/records");
   };
 
   return (
-    <div className="upload-page">
+    <div className="dash-layout upload-page">
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
+      {sidebarOpen && (
+        <div
+          className="dash-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {shouldRenderOldUploadSidebar && (
       <aside className="upload-sidebar">
         <div className="upload-logo">
           <div className="upload-logo-icon">NIC</div>
@@ -261,9 +277,18 @@ navigate("/records");
           Logout
         </button>
       </aside>
+      )}
 
       <main className="upload-main">
         <header className="upload-header">
+          <button
+            type="button"
+            className="dash-menu-toggle"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            â˜°
+          </button>
+
           <div>
             <p className="upload-breadcrumb">
               Dashboard / Upload CSV
