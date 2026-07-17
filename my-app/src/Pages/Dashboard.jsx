@@ -15,23 +15,26 @@ function Dashboard() {
   const [searchText, setSearchText] =
     useState("");
 
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
+  const [user] = useState(() => {
     const savedUser = localStorage.getItem("user");
 
     if (!savedUser) {
-      navigate("/");
-      return;
+      return null;
     }
 
     try {
-      setUser(JSON.parse(savedUser));
+      return JSON.parse(savedUser);
     } catch {
       localStorage.removeItem("user");
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    if (!user) {
       navigate("/");
     }
-  }, [navigate]);
+  }, [navigate, user]);
 
   /*
    * Read the latest upload and validation result.
