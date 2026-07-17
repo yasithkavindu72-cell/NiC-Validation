@@ -1,0 +1,17 @@
+{
+  "name": "nic-validation-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NIC Validation Microservices Application",
+  "scripts": {
+    "dev": "concurrently -k -n FRONTEND,GATEWAY,AUTH,UPLOAD,VALIDATION \"npm run dev --prefix my-app\" \"npm run dev --prefix services/api-gateway\" \"npm run dev --prefix services/auth-service\" \"npm run dev --prefix services/upload-service\" \"npm run dev --prefix services/validation-service\"",
+    "dev:frontend": "npm run dev --prefix my-app",
+    "dev:gateway": "npm run dev --prefix services/api-gateway",
+    "dev:auth": "npm run dev --prefix services/auth-service",
+    "dev:upload": "npm run dev --prefix services/upload-service",
+    "dev:validation": "npm run dev --prefix services/validation-service"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
