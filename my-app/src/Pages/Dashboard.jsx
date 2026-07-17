@@ -231,13 +231,6 @@ function Dashboard() {
             Reports
           </button>
 
-          <button
-            type="button"
-            className="dash-menu-item"
-          >
-            <span>⚙️</span>
-            Settings
-          </button>
         </nav>
 
         <button
