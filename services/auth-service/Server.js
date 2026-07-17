@@ -7,9 +7,25 @@ const verifyToken = require("./Middleware/AuthMiddleware");
 
 const app = express();
 
+const allowedFrontendUrl =
+  process.env.FRONTEND_URL || "http://localhost:5173";
+
+const corsOrigin = (origin, callback) => {
+  if (
+    !origin ||
+    origin === allowedFrontendUrl ||
+    /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)
+  ) {
+    callback(null, true);
+    return;
+  }
+
+  callback(new Error("Not allowed by CORS"));
+};
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: corsOrigin,
     credentials: true,
   })
 );
