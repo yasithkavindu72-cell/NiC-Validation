@@ -75,13 +75,6 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
           );
         })}
 
-        <button
-          type="button"
-          className="dash-menu-item"
-        >
-          <span>⚙️</span>
-          Settings
-        </button>
       </nav>
 
       <button
