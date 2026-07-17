@@ -1,10 +1,15 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import * as XLSX from "xlsx";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+import Sidebar from "./Slidebar";
 
 
 
 function Reports() {
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState("all");
   const [message, setMessage] = useState("");
 
@@ -321,16 +326,6 @@ function Reports() {
     setMessage("PDF report downloaded successfully.");
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    sessionStorage.removeItem(
-      "nicValidationResult"
-    );
-
-    navigate("/");
-  };
-
   if (!validationResult) {
     return (
       <div className="reports-empty-page">
@@ -352,58 +347,29 @@ function Reports() {
   }
 
   return (
-    <div className="reports-page">
-      <aside className="reports-sidebar">
-        <div className="reports-logo">
-          <strong>NIC</strong>
+    <div className="dash-layout reports-page">
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-          <div>
-            <h2>NIC Validation</h2>
-            <p>Microservices System</p>
-          </div>
-        </div>
-
-        <nav>
-          <button
-            type="button"
-            onClick={() => navigate("/dashboard")}
-          >
-            Dashboard
-          </button>
-
-          <button
-            type="button"
-            onClick={() => navigate("/upload")}
-          >
-            Upload CSV
-          </button>
-
-          <button
-            type="button"
-            onClick={() => navigate("/records")}
-          >
-            NIC Records
-          </button>
-
-          <button
-            type="button"
-            className="active"
-          >
-            Reports
-          </button>
-        </nav>
-
-        <button
-          type="button"
-          className="reports-logout-button"
-          onClick={handleLogout}
-        >
-          Logout
-        </button>
-      </aside>
+      {sidebarOpen && (
+        <div
+          className="dash-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       <main className="reports-main">
         <header className="reports-header">
+          <button
+            type="button"
+            className="dash-menu-toggle"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            ☰
+          </button>
+
           <div>
             <p>Dashboard / Reports</p>
             <h1>NIC Validation Reports</h1>

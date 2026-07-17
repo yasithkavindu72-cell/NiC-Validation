@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Sidebar from "./Slidebar";
 
 
 function NicRecords() {
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [filter, setFilter] = useState("all");
 
   const storedResult = sessionStorage.getItem(
@@ -50,13 +52,6 @@ function NicRecords() {
     }
   }, [records, filter]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    sessionStorage.removeItem("nicValidationResult");
-    navigate("/");
-  };
-
   if (!result) {
     return (
       <div className="records-empty-page">
@@ -80,52 +75,29 @@ function NicRecords() {
   const summary = result.validation || {};
 
   return (
-    <div className="records-page">
-      <aside className="records-sidebar">
-        <div className="records-logo">
-          <strong>NIC</strong>
+    <div className="dash-layout records-page">
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-          <div>
-            <h2>NIC Validation</h2>
-            <p>Microservices System</p>
-          </div>
-        </div>
-
-        <nav>
-          <button
-            type="button"
-            onClick={() => navigate("/dashboard")}
-          >
-            Dashboard
-          </button>
-
-          <button
-            type="button"
-            onClick={() => navigate("/upload")}
-          >
-            Upload CSV
-          </button>
-
-          <button type="button" className="active">
-            NIC Records
-          </button>
-
-          <button type="button" disabled>
-            Reports
-          </button>
-        </nav>
-
-        <button
-          type="button"
-          className="records-logout-button"
-          onClick={handleLogout}
-        >
-          Logout
-        </button>
-      </aside>
+      {sidebarOpen && (
+        <div
+          className="dash-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       <main className="records-main">
         <header className="records-header">
+          <button
+            type="button"
+            className="dash-menu-toggle"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            ☰
+          </button>
+
           <div>
             <p>Dashboard / NIC Records</p>
             <h1>Validated NIC Records</h1>

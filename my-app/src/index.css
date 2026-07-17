@@ -1401,8 +1401,16 @@ body {
   margin-left: 260px;
 }
 
+.records-page .records-main,
+.reports-page .reports-main {
+  width: calc(100% - 260px);
+  margin-left: 260px;
+}
+
 @media (max-width: 850px) {
-  .upload-page .upload-main {
+  .upload-page .upload-main,
+  .records-page .records-main,
+  .reports-page .reports-main {
     width: 100%;
     margin-left: 0;
   }
