@@ -127,7 +127,8 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .login-card::after {
+  .login-card::after,
+  .register-card::after {
     animation: none;
   }
 }
@@ -263,10 +264,40 @@ body {
 .register-card {
   width: 100%;
   max-width: 450px;
+  position: relative;
+  isolation: isolate;
   background: #ffffff;
   padding: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
   border-radius: 20px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.register-card::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: -2px;
+  padding: 3px;
+  border-radius: 22px;
+  background: conic-gradient(
+    from var(--login-border-angle),
+    transparent 0deg,
+    transparent 275deg,
+    #7c3aed 305deg,
+    #c084fc 330deg,
+    #ffffff 342deg,
+    #7c3aed 355deg,
+    transparent 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.85));
+  animation: login-border-spin 2.5s linear infinite;
 }
 
 .register-title {
