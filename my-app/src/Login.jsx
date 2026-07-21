@@ -112,6 +112,16 @@ function Login() {
           </p>
         </form>
       </div>
+
+      {loading && (
+        <div className="login-loading-overlay" role="status" aria-live="polite">
+          <div className="login-loading-content">
+            <span className="login-loading-spinner" aria-hidden="true" />
+            <strong>Signing you in</strong>
+            <span>Please wait a moment...</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

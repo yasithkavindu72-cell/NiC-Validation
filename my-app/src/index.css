@@ -241,6 +241,84 @@ body {
   text-decoration: underline;
 }
 
+.login-loading-overlay {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(7, 21, 46, 0.5);
+  -webkit-backdrop-filter: blur(14px) saturate(130%);
+  backdrop-filter: blur(14px) saturate(130%);
+  animation: login-overlay-in 0.25s ease-out;
+}
+
+.login-loading-content {
+  min-width: 210px;
+  padding: 30px 34px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 24px;
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 24px 65px rgba(2, 8, 23, 0.3);
+  animation: login-loader-in 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.login-loading-content strong {
+  margin-top: 8px;
+  font-size: 16px;
+  letter-spacing: -0.2px;
+}
+
+.login-loading-content > span:last-child {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.login-loading-spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid #e2e8f0;
+  border-top-color: #2563eb;
+  border-right-color: #60a5fa;
+  border-radius: 50%;
+  animation: login-spinner-rotate 0.8s linear infinite;
+}
+
+@keyframes login-spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes login-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes login-loader-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-loading-overlay,
+  .login-loading-content,
+  .login-loading-spinner {
+    animation: none;
+  }
+}
+
 @media (max-width: 500px) {
   .login-card {
     padding: 38px 24px 32px;
