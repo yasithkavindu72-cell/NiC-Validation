@@ -12,6 +12,8 @@ function Register() {
     useState("");
   const [loading, setLoading] = useState(false);
   const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
   const navigate = useNavigate();
 
@@ -37,12 +39,12 @@ function Register() {
     }
 
     if (password.length < 8) {
-      alert("Password must contain at least 8 characters");
+      setPasswordError("Password must contain at least 8 characters");
       return;
     }
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      setConfirmPasswordError("Passwords do not match");
       return;
     }
 
@@ -150,28 +152,69 @@ function Register() {
           )}
 
           <input
-            className="register-input"
+            className={`register-input ${passwordError ? "register-input-error" : ""}`}
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
+            aria-invalid={Boolean(passwordError)}
+            aria-describedby={passwordError ? "register-password-error" : undefined}
+            onChange={(e) => {
+              const nextPassword = e.target.value;
+              setPassword(nextPassword);
+              setPasswordError("");
+
+              if (confirmPassword && nextPassword !== confirmPassword) {
+                setConfirmPasswordError("Passwords do not match");
+              } else {
+                setConfirmPasswordError("");
+              }
+            }}
+            onBlur={() => {
+              if (password && password.length < 8) {
+                setPasswordError("Password must contain at least 8 characters");
+              }
+            }}
             minLength={8}
             required
           />
 
+          {passwordError && (
+            <p id="register-password-error" className="register-error-message" role="alert">
+              {passwordError}
+            </p>
+          )}
+
           <input
-            className="register-input"
+            className={`register-input ${confirmPasswordError ? "register-input-error" : ""}`}
             type="password"
             placeholder="Confirm Password"
             value={confirmPassword}
-            onChange={(e) =>
-              setConfirmPassword(e.target.value)
-            }
+            aria-invalid={Boolean(confirmPasswordError)}
+            aria-describedby={confirmPasswordError ? "register-confirm-password-error" : undefined}
+            onChange={(e) => {
+              const nextConfirmPassword = e.target.value;
+              setConfirmPassword(nextConfirmPassword);
+
+              if (nextConfirmPassword && nextConfirmPassword !== password) {
+                setConfirmPasswordError("Passwords do not match");
+              } else {
+                setConfirmPasswordError("");
+              }
+            }}
+            onBlur={() => {
+              if (confirmPassword && confirmPassword !== password) {
+                setConfirmPasswordError("Passwords do not match");
+              }
+            }}
             minLength={8}
             required
           />
+
+          {confirmPasswordError && (
+            <p id="register-confirm-password-error" className="register-error-message" role="alert">
+              {confirmPasswordError}
+            </p>
+          )}
 
           <button
             className="register-button"
