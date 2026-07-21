@@ -424,6 +424,20 @@ body {
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
 }
 
+.register-input.register-input-error,
+.register-input.register-input-error:focus {
+  border-color: #dc2626;
+  background: #fff7f7;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.register-form .register-error-message {
+  margin-top: -10px;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .register-button {
   width: 100%;
   padding: 14px;

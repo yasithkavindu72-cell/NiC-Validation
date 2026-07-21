@@ -5,6 +5,7 @@ const db = require("../config/ProjectDB");
 
 const router = express.Router();
 const SALT_ROUNDS = 12;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 /* ==============================
    REGISTER
@@ -19,6 +20,13 @@ router.post("/register", (req, res) => {
     return res.status(400).json({
       success: false,
       message: "Username, email and password are required",
+    });
+  }
+
+  if (email.length > 254 || !EMAIL_PATTERN.test(email)) {
+    return res.status(400).json({
+      success: false,
+      message: "Please enter a valid email address",
     });
   }
 

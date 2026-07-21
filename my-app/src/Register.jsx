@@ -2,6 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
 function Register() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -9,6 +11,7 @@ function Register() {
   const [confirmPassword, setConfirmPassword] =
     useState("");
   const [loading, setLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
 
   const navigate = useNavigate();
 
@@ -20,6 +23,11 @@ function Register() {
 
     if (!cleanUsername || !cleanEmail || !password) {
       alert("Please complete all fields");
+      return;
+    }
+
+    if (cleanEmail.length > 254 || !EMAIL_PATTERN.test(cleanEmail)) {
+      setEmailError("Please enter a valid email address");
       return;
     }
 
@@ -114,15 +122,32 @@ function Register() {
           />
 
           <input
-            className="register-input"
+            className={`register-input ${emailError ? "register-input-error" : ""}`}
             type="email"
             placeholder="Email Address"
             value={email}
-            onChange={(e) =>
+            aria-invalid={Boolean(emailError)}
+            aria-describedby={emailError ? "register-email-error" : undefined}
+            maxLength={254}
+            onChange={(e) => {
               setEmail(e.target.value)
-            }
+              setEmailError("");
+            }}
+            onBlur={() => {
+              const cleanEmail = email.trim().toLowerCase();
+
+              if (cleanEmail && !EMAIL_PATTERN.test(cleanEmail)) {
+                setEmailError("Please enter a valid email address");
+              }
+            }}
             required
           />
+
+          {emailError && (
+            <p id="register-email-error" className="register-error-message" role="alert">
+              {emailError}
+            </p>
+          )}
 
           <input
             className="register-input"
