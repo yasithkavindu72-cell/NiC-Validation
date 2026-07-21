@@ -154,6 +154,8 @@ body {
   .login-page,
   .login-page::before,
   .login-page::after,
+  .register-page::before,
+  .register-page::after,
   .login-card::after,
   .register-card::after {
     animation: none;
@@ -361,20 +363,52 @@ body {
 .register-page {
   width: 100%;
   min-height: 100vh;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   padding: 20px;
+  position: relative;
+  overflow: hidden;
+  background-color: #050816;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    radial-gradient(circle at center, #152659 0%, #080d22 48%, #03050d 100%);
+  background-size: 42px 42px, 42px 42px, 100% 100%;
+}
 
-  background: linear-gradient(135deg, #0f172a, #1e3a8a);
+.register-page::before,
+.register-page::after {
+  content: "";
+  position: absolute;
+  width: min(48vw, 650px);
+  height: min(48vw, 650px);
+  border-radius: 42% 58% 65% 35% / 45% 38% 62% 55%;
+  filter: blur(70px);
+  opacity: 0.48;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.register-page::before {
+  top: -24%;
+  left: -12%;
+  background: linear-gradient(135deg, #06b6d4, #2563eb 55%, transparent 75%);
+  animation: login-aurora-one 11s ease-in-out infinite alternate;
+}
+
+.register-page::after {
+  right: -15%;
+  bottom: -25%;
+  background: linear-gradient(135deg, transparent 10%, #7c3aed 42%, #db2777);
+  animation: login-aurora-two 13s ease-in-out infinite alternate;
 }
 
 .register-card {
   width: 100%;
   max-width: 450px;
   position: relative;
+  z-index: 1;
   isolation: isolate;
   background: #ffffff;
   padding: 40px;
