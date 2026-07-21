@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import LogoutOverlay from "../LogoutOverlay";
 
 const menuItems = [
   {
@@ -26,6 +28,7 @@ const menuItems = [
 function Sidebar({ isOpen = false, onClose = () => {} }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const openPage = (path) => {
     navigate(path);
@@ -33,16 +36,23 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    sessionStorage.removeItem("nicValidationResult");
+    if (isLoggingOut) return;
 
-    navigate("/");
-    onClose();
+    setIsLoggingOut(true);
+
+    window.setTimeout(() => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      sessionStorage.removeItem("nicValidationResult");
+
+      navigate("/");
+      onClose();
+    }, 800);
   };
 
   return (
-    <aside
+    <>
+      <aside
       className={`dash-sidebar ${
         isOpen ? "dash-sidebar-open" : ""
       }`}
@@ -81,11 +91,15 @@ function Sidebar({ isOpen = false, onClose = () => {} }) {
         type="button"
         className="dash-logout-button"
         onClick={handleLogout}
+        disabled={isLoggingOut}
       >
         <span>🚪</span>
         Logout
       </button>
-    </aside>
+      </aside>
+
+      {isLoggingOut && <LogoutOverlay />}
+    </>
   );
 }
 

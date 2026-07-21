@@ -5,11 +5,14 @@ import {
 } from "react";
 
 import { useNavigate } from "react-router-dom";
+import LogoutOverlay from "../LogoutOverlay";
 
 function Dashboard() {
   const navigate = useNavigate();
 
   const [sidebarOpen, setSidebarOpen] =
+    useState(false);
+  const [isLoggingOut, setIsLoggingOut] =
     useState(false);
 
   const [searchText, setSearchText] =
@@ -168,14 +171,20 @@ function Dashboard() {
   }, [records, searchText]);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    if (isLoggingOut) return;
 
-    sessionStorage.removeItem(
-      "nicValidationResult"
-    );
+    setIsLoggingOut(true);
 
-    navigate("/");
+    window.setTimeout(() => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      sessionStorage.removeItem(
+        "nicValidationResult"
+      );
+
+      navigate("/");
+    }, 800);
   };
 
   return (
@@ -237,11 +246,14 @@ function Dashboard() {
           type="button"
           className="dash-logout-button"
           onClick={handleLogout}
+          disabled={isLoggingOut}
         >
           <span>🚪</span>
           Logout
         </button>
       </aside>
+
+      {isLoggingOut && <LogoutOverlay />}
 
       {sidebarOpen && (
         <div

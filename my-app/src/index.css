@@ -289,6 +289,11 @@ body {
   animation: login-spinner-rotate 0.8s linear infinite;
 }
 
+.logout-loading-spinner {
+  border-top-color: #7c3aed;
+  border-right-color: #c084fc;
+}
+
 @keyframes login-spinner-rotate {
   to {
     transform: rotate(360deg);
