@@ -6,6 +6,9 @@ require("dotenv").config();
 const UploadRoutes = require(
   "./Routers/Upload"
 );
+const {
+  initializeUploadSchema,
+} = require("./Services/UploadRepository");
 
 const app = express();
 
@@ -88,8 +91,22 @@ app.use((error, req, res, next) => {
 
 const PORT = process.env.PORT || 5002;
 
-app.listen(PORT, () => {
-  console.log(
-    `Upload Service running on http://localhost:${PORT}`
-  );
-});
+async function startServer() {
+  try {
+    await initializeUploadSchema();
+
+    app.listen(PORT, () => {
+      console.log(
+        `Upload Service running on http://localhost:${PORT}`
+      );
+    });
+  } catch (error) {
+    console.error(
+      "Upload Service database initialization failed:",
+      error.message
+    );
+    process.exit(1);
+  }
+}
+
+startServer();

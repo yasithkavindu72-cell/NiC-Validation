@@ -8,6 +8,9 @@ const {
   parseCsvBuffer,
   findNicColumn,
 } = require("../Services/CsvReader");
+const {
+  saveValidatedUpload,
+} = require("../Services/UploadRepository");
 
 const router = express.Router();
 
@@ -121,12 +124,19 @@ router.post(
         );
       }
 
+      const batchId = await saveValidatedUpload({
+        validatedFiles: validationData.files,
+        summary: validationData.summary,
+      });
+
       return res.status(200).json({
         success: true,
         message:
           "Four CSV files uploaded and validated successfully.",
         totalFiles: parsedFiles.length,
         totalRecords,
+        batchId,
+        savedToDatabase: true,
         validation: validationData.summary,
         files: validationData.files,
       });
