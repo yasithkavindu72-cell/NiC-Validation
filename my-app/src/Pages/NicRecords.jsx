@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Slidebar";
+import DashboardTopbar from "../DashboardTopbar";
 
 
 function NicRecords() {
@@ -68,6 +69,8 @@ function NicRecords() {
         )}
 
         <main className="records-main records-empty-page">
+          <DashboardTopbar />
+
           <button
             type="button"
             className="dash-menu-toggle records-empty-menu-toggle"
@@ -109,6 +112,8 @@ function NicRecords() {
       )}
 
       <main className="records-main">
+        <DashboardTopbar />
+
         <header className="records-header">
           <button
             type="button"

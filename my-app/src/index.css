@@ -2329,3 +2329,49 @@ body {
 .dash-sidebar {
   transition: transform 0.4s ease-in-out;
 }
+
+/* Shared dashboard header on Upload, NIC Records and Reports */
+.page-dashboard-topbar {
+  min-height: 82px;
+  margin: -32px -32px 30px;
+  padding: 15px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.upload-main > .page-dashboard-topbar {
+  margin: -38px -38px 30px;
+}
+
+.page-dashboard-topbar h1 {
+  margin: 0 0 4px;
+  color: #0f172a;
+  font-size: 25px;
+}
+
+.page-dashboard-topbar p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.records-empty-page > .page-dashboard-topbar,
+.reports-empty-page > .page-dashboard-topbar {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+  left: 32px;
+  margin: -32px;
+  text-align: left;
+}
+
+@media (max-width: 600px) {
+  .page-dashboard-topbar {
+    margin-right: -16px;
+    margin-left: -16px;
+    padding: 14px 16px;
+  }
+}

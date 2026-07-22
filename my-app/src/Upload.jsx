@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Pages/Slidebar";
+import DashboardTopbar from "./DashboardTopbar";
 
 
 const API_URL =
@@ -280,6 +281,8 @@ navigate("/records");
       )}
 
       <main className="upload-main">
+        <DashboardTopbar />
+
         <header className="upload-header">
           <button
             type="button"

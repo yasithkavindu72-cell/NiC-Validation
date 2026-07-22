@@ -4,6 +4,7 @@ import * as XLSX from "xlsx";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import Sidebar from "./Slidebar";
+import DashboardTopbar from "../DashboardTopbar";
 
 
 
@@ -342,6 +343,8 @@ function Reports() {
         )}
 
         <main className="reports-main reports-empty-page">
+          <DashboardTopbar />
+
           <button
             type="button"
             className="dash-menu-toggle reports-empty-menu-toggle"
@@ -381,6 +384,8 @@ function Reports() {
       )}
 
       <main className="reports-main">
+        <DashboardTopbar />
+
         <header className="reports-header">
           <button
             type="button"
