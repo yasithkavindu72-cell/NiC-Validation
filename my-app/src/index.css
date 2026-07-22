@@ -1992,9 +1992,17 @@ body {
 
 .records-empty-page {
   min-height: 100vh;
+  position: relative;
   display: grid;
   place-content: center;
   text-align: center;
+}
+
+.records-empty-menu-toggle,
+.reports-empty-menu-toggle {
+  position: absolute;
+  top: 24px;
+  left: 24px;
 }
 
 .records-empty-page button {
@@ -2256,6 +2264,7 @@ body {
 
 .reports-empty-page {
   min-height: 100vh;
+  position: relative;
   display: grid;
   place-content: center;
   text-align: center;

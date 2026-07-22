@@ -54,20 +54,40 @@ function NicRecords() {
 
   if (!result) {
     return (
-      <div className="records-empty-page">
-        <h1>No validation results found</h1>
+      <div className="dash-layout records-page">
+        <Sidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
 
-        <p>
-          Upload and validate four CSV files before opening
-          this page.
-        </p>
+        {sidebarOpen && (
+          <div
+            className="dash-overlay"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
 
-        <button
-          type="button"
-          onClick={() => navigate("/upload")}
-        >
-          Go to Upload
-        </button>
+        <main className="records-main records-empty-page">
+          <button
+            type="button"
+            className="dash-menu-toggle records-empty-menu-toggle"
+            aria-label="Open navigation"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            ☰
+          </button>
+
+          <div>
+            <h1>No validation results found</h1>
+            <p>
+              Upload and validate four CSV files before opening
+              this page.
+            </p>
+            <button type="button" onClick={() => navigate("/upload")}>
+              Go to Upload
+            </button>
+          </div>
+        </main>
       </div>
     );
   }

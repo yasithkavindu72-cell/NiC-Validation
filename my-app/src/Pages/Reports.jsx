@@ -328,20 +328,40 @@ function Reports() {
 
   if (!validationResult) {
     return (
-      <div className="reports-empty-page">
-        <h1>No report data found</h1>
+      <div className="dash-layout reports-page">
+        <Sidebar
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
 
-        <p>
-          Upload and validate four CSV files before
-          generating reports.
-        </p>
+        {sidebarOpen && (
+          <div
+            className="dash-overlay"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
 
-        <button
-          type="button"
-          onClick={() => navigate("/upload")}
-        >
-          Go to Upload
-        </button>
+        <main className="reports-main reports-empty-page">
+          <button
+            type="button"
+            className="dash-menu-toggle reports-empty-menu-toggle"
+            aria-label="Open navigation"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+          >
+            ☰
+          </button>
+
+          <div>
+            <h1>No report data found</h1>
+            <p>
+              Upload and validate four CSV files before
+              generating reports.
+            </p>
+            <button type="button" onClick={() => navigate("/upload")}>
+              Go to Upload
+            </button>
+          </div>
+        </main>
       </div>
     );
   }
