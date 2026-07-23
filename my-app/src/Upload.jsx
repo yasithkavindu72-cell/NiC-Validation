@@ -68,7 +68,7 @@ function Upload() {
       );
 
       if (isDuplicate) {
-        showMessage(`${file.name} has already been selected.`);
+        showMessage("You have uploaded duplicate files.");
         continue;
       }
 
@@ -158,7 +158,16 @@ function Upload() {
         body: formData,
       });
 
-      const data = await response.json();
+      const responseText = await response.text();
+      let data;
+
+      try {
+        data = JSON.parse(responseText);
+      } catch {
+        throw new Error(
+          "The Upload Service returned an invalid response."
+        );
+      }
 
       if (!response.ok) {
         throw new Error(data.message || "CSV upload failed.");
@@ -184,8 +193,9 @@ navigate("/records");
       console.error("Upload error:", error);
 
       showMessage(
-        error.message ||
-          "Unable to connect to the Upload Service."
+        error instanceof TypeError
+          ? "Unable to connect to the Upload Service. Please check that the backend is running."
+          : error.message || "CSV upload failed."
       );
     } finally {
       setIsUploading(false);

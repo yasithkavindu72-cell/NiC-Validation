@@ -9,6 +9,7 @@ const {
   findNicColumn,
 } = require("../Services/CsvReader");
 const {
+  findExistingFileNames,
   saveValidatedUpload,
 } = require("../Services/UploadRepository");
 
@@ -28,6 +29,32 @@ router.post(
           receivedFiles: req.files
             ? req.files.length
             : 0,
+        });
+      }
+
+      const uploadedFileNames = req.files.map(
+        (file) => file.originalname
+      );
+      const uniqueFileNames = new Set(
+        uploadedFileNames.map((fileName) => fileName.toLowerCase())
+      );
+
+      if (uniqueFileNames.size !== uploadedFileNames.length) {
+        return res.status(409).json({
+          success: false,
+          message: "You have uploaded duplicate files.",
+        });
+      }
+
+      const existingFileNames = await findExistingFileNames(
+        uploadedFileNames
+      );
+
+      if (existingFileNames.length > 0) {
+        return res.status(409).json({
+          success: false,
+          message: "You have uploaded duplicate files.",
+          duplicateFiles: existingFileNames,
         });
       }
 

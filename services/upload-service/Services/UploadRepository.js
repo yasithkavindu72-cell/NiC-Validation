@@ -109,7 +109,24 @@ async function saveValidatedUpload({ validatedFiles, summary }) {
   }
 }
 
+async function findExistingFileNames(fileNames) {
+  if (!Array.isArray(fileNames) || fileNames.length === 0) {
+    return [];
+  }
+
+  const placeholders = fileNames.map(() => "?").join(", ");
+  const [rows] = await db.query(
+    `SELECT DISTINCT original_name
+     FROM uploaded_files
+     WHERE original_name IN (${placeholders})`,
+    fileNames
+  );
+
+  return rows.map((row) => row.original_name);
+}
+
 module.exports = {
   initializeUploadSchema,
+  findExistingFileNames,
   saveValidatedUpload,
 };
