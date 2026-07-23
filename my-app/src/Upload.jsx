@@ -194,7 +194,7 @@ navigate("/records");
 
       showMessage(
         error instanceof TypeError
-          ? "Unable to connect to the Upload Service. Please check that the backend is running."
+          ? "You have uploaded duplicate files."
           : error.message || "CSV upload failed."
       );
     } finally {
