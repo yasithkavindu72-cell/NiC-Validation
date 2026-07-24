@@ -14,8 +14,14 @@ function Register() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
+  const [flipping, setFlipping] = useState(false);
 
   const navigate = useNavigate();
+
+  const openLogin = () => {
+    setFlipping(true);
+    window.setTimeout(() => navigate("/"), 560);
+  };
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -98,7 +104,7 @@ function Register() {
 
   return (
     <div className="register-page">
-      <div className="register-card">
+      <div className={`register-card auth-rotating-card auth-register-face ${flipping ? "auth-flip-out-right" : ""}`}>
         <h1 className="register-title">
           Create Account
         </h1>
@@ -231,7 +237,7 @@ function Register() {
           Already have an account?{" "}
           <button
             type="button"
-            onClick={() => navigate("/")}
+            onClick={openLogin}
           >
             Login
           </button>

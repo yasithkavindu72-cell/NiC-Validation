@@ -2330,6 +2330,102 @@ body {
   transition: transform 0.4s ease-in-out;
 }
 
+/* 3D login/register flip transition */
+.login-page,
+.register-page {
+  perspective: 1400px;
+}
+
+.auth-rotating-card {
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+.auth-login-face {
+  animation: auth-rotate-from-left 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.auth-register-face {
+  animation: auth-rotate-from-right 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.auth-rotating-card.auth-flip-out-left {
+  animation: auth-rotate-out-left 0.6s cubic-bezier(0.55, 0, 0.8, 0.2) forwards;
+  pointer-events: none;
+}
+
+.auth-rotating-card.auth-flip-out-right {
+  animation: auth-rotate-out-right 0.6s cubic-bezier(0.55, 0, 0.8, 0.2) forwards;
+  pointer-events: none;
+}
+
+.login-card .auth-text-link {
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: 0;
+  color: #2563eb;
+  background: transparent;
+  box-shadow: none;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.login-card .auth-text-link:hover {
+  color: #1d4ed8;
+  background: transparent;
+  box-shadow: none;
+  text-decoration: underline;
+  transform: none;
+}
+
+@keyframes auth-rotate-from-left {
+  from {
+    opacity: 0;
+    transform: rotateY(-180deg) scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: rotateY(0deg) scale(1);
+  }
+}
+
+@keyframes auth-rotate-from-right {
+  from {
+    opacity: 0;
+    transform: rotateY(180deg) scale(0.82);
+  }
+  to {
+    opacity: 1;
+    transform: rotateY(0deg) scale(1);
+  }
+}
+
+@keyframes auth-rotate-out-left {
+  to {
+    opacity: 0;
+    transform: rotateY(-180deg) scale(0.82);
+  }
+}
+
+@keyframes auth-rotate-out-right {
+  to {
+    opacity: 0;
+    transform: rotateY(180deg) scale(0.82);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-login-face,
+  .auth-register-face,
+  .auth-rotating-card.auth-flip-out-left,
+  .auth-rotating-card.auth-flip-out-right {
+    animation-duration: 0.01ms;
+  }
+}
+
 /* Shared dashboard header on Upload, NIC Records and Reports */
 .page-dashboard-topbar {
   min-height: 82px;

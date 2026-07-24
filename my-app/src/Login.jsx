@@ -1,14 +1,20 @@
 import { useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
+  const [flipping, setFlipping] = useState(false);
 
   const navigate = useNavigate();
+
+  const openRegister = () => {
+    setFlipping(true);
+    window.setTimeout(() => navigate("/register"), 560);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -55,7 +61,7 @@ function Login() {
 
   return (
     <div className="login-page">
-      <div className={`login-card ${loginError ? "login-card-error" : ""}`}>
+      <div className={`login-card auth-rotating-card auth-login-face ${flipping ? "auth-flip-out-left" : ""} ${loginError ? "login-card-error" : ""}`}>
         <h1 className="login-title">Welcome Back</h1>
 
         <p className="login-subtitle">
@@ -108,7 +114,9 @@ function Login() {
 
           <p className="login-link">
             Don't have an account?{" "}
-            <Link to="/register">Register</Link>
+            <button type="button" className="auth-text-link" onClick={openRegister}>
+              Register
+            </button>
           </p>
         </form>
       </div>
