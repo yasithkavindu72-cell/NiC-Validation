@@ -299,7 +299,7 @@ navigate("/records");
             className="dash-menu-toggle"
             onClick={() => setSidebarOpen(!sidebarOpen)}
           >
-            â˜°
+            ☰
           </button>
 
           <div>
