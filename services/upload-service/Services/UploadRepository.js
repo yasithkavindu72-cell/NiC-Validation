@@ -125,8 +125,33 @@ async function findExistingFileNames(fileNames) {
   return rows.map((row) => row.original_name);
 }
 
+async function findExistingNicNumbers(nicNumbers) {
+  if (!Array.isArray(nicNumbers) || nicNumbers.length === 0) {
+    return [];
+  }
+
+  const existingNicNumbers = [];
+  const chunkSize = 1000;
+
+  for (let index = 0; index < nicNumbers.length; index += chunkSize) {
+    const chunk = nicNumbers.slice(index, index + chunkSize);
+    const placeholders = chunk.map(() => "?").join(", ");
+    const [rows] = await db.query(
+      `SELECT DISTINCT nic_number
+       FROM nic_records
+       WHERE nic_number IN (${placeholders})`,
+      chunk
+    );
+
+    existingNicNumbers.push(...rows.map((row) => row.nic_number));
+  }
+
+  return existingNicNumbers;
+}
+
 module.exports = {
   initializeUploadSchema,
   findExistingFileNames,
+  findExistingNicNumbers,
   saveValidatedUpload,
 };

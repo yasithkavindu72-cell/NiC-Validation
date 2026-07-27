@@ -10,6 +10,7 @@ const {
 } = require("../Services/CsvReader");
 const {
   findExistingFileNames,
+  findExistingNicNumbers,
   saveValidatedUpload,
 } = require("../Services/UploadRepository");
 
@@ -105,6 +106,37 @@ router.post(
           total + file.rowCount,
         0
       );
+
+      const nicNumbers = parsedFiles
+        .flatMap((file) => file.records)
+        .map((record) => record.nic.trim().toUpperCase())
+        .filter(Boolean);
+      const seenNicNumbers = new Set();
+      const duplicateNicNumbers = new Set();
+
+      nicNumbers.forEach((nicNumber) => {
+        if (seenNicNumbers.has(nicNumber)) {
+          duplicateNicNumbers.add(nicNumber);
+        }
+
+        seenNicNumbers.add(nicNumber);
+      });
+
+      const existingNicNumbers = await findExistingNicNumbers(
+        [...seenNicNumbers]
+      );
+
+      existingNicNumbers.forEach((nicNumber) => {
+        duplicateNicNumbers.add(String(nicNumber).toUpperCase());
+      });
+
+      if (duplicateNicNumbers.size > 0) {
+        return res.status(409).json({
+          success: false,
+          message: "Duplicate NIC numbers are not allowed.",
+          duplicateNicNumbers: [...duplicateNicNumbers],
+        });
+      }
 
       const validationServiceUrl =
         process.env.VALIDATION_SERVICE_URL ||
