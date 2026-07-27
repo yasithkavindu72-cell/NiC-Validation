@@ -694,6 +694,7 @@ body {
   display: none;
   border: none;
   background: transparent;
+  color: #2563eb;
   font-size: 25px;
   cursor: pointer;
 }
@@ -2001,8 +2002,22 @@ body {
 .records-empty-menu-toggle,
 .reports-empty-menu-toggle {
   position: absolute;
-  top: 24px;
+  top: 112px;
   left: 24px;
+}
+
+.records-empty-page .records-empty-menu-toggle,
+.reports-empty-page .reports-empty-menu-toggle {
+  width: auto;
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  color: #2563eb;
+  background: transparent;
+  box-shadow: none;
+  font-size: 28px;
+  line-height: 1;
 }
 
 .records-empty-page button {
