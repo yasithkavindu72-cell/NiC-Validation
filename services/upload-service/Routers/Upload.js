@@ -13,6 +13,10 @@ const {
   findExistingNicNumbers,
   saveValidatedUpload,
 } = require("../Services/UploadRepository");
+const {
+  saveFilesToServer,
+  removeStoredBatch,
+} = require("../Services/FileStorage");
 
 const router = express.Router();
 
@@ -183,10 +187,18 @@ router.post(
         );
       }
 
-      const batchId = await saveValidatedUpload({
-        validatedFiles: validationData.files,
-        summary: validationData.summary,
-      });
+      const storedUpload = await saveFilesToServer(req.files);
+      let batchId;
+
+      try {
+        batchId = await saveValidatedUpload({
+          validatedFiles: validationData.files,
+          summary: validationData.summary,
+        });
+      } catch (error) {
+        await removeStoredBatch(storedUpload.batchDirectory);
+        throw error;
+      }
 
       return res.status(200).json({
         success: true,
@@ -196,6 +208,9 @@ router.post(
         totalRecords,
         batchId,
         savedToDatabase: true,
+        savedToServer: true,
+        storageBatch: storedUpload.storageBatch,
+        storedFiles: storedUpload.storedFiles,
         validation: validationData.summary,
         files: validationData.files,
       });

@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Runtime-uploaded CSV files
+services/upload-service/storage/uploads/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
