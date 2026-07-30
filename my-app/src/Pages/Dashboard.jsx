@@ -8,40 +8,46 @@ import { useNavigate } from "react-router-dom";
 import LogoutOverlay from "../LogoutOverlay";
 
 function Dashboard() {
+  // React Router helper used to move between application pages.
   const navigate = useNavigate();
 
+  // Control the mobile sidebar and logout loading overlay.
   const [sidebarOpen, setSidebarOpen] =
     useState(false);
   const [isLoggingOut, setIsLoggingOut] =
     useState(false);
 
+  // Store the text entered in the NIC search field.
   const [searchText, setSearchText] =
     useState("");
 
+  // Read the logged-in user once when the Dashboard first loads.
   const [user] = useState(() => {
     const savedUser = localStorage.getItem("user");
 
+    // No saved user means that there is no active login.
     if (!savedUser) {
       return null;
     }
 
     try {
+      // Convert the saved JSON text back into a user object.
       return JSON.parse(savedUser);
     } catch {
+      // Remove invalid saved data so it is not reused later.
       localStorage.removeItem("user");
       return null;
     }
   });
 
+  // Redirect visitors to the login page when no user is available.
   useEffect(() => {
     if (!user) {
       navigate("/");
     }
   }, [navigate, user]);
 
-  /*
-   * Read the latest upload and validation result.
-   */
+  // Read and parse the latest NIC validation result once.
   const validationResult = useMemo(() => {
     try {
       const savedResult = sessionStorage.getItem(
@@ -61,18 +67,14 @@ function Dashboard() {
     }
   }, []);
 
-  /*
-   * Get the four uploaded files.
-   */
+  // Safely get the uploaded files, or use an empty array.
   const uploadedFiles = useMemo(() => {
     return Array.isArray(validationResult?.files)
       ? validationResult.files
       : [];
   }, [validationResult]);
 
-  /*
-   * Combine all records from all four CSV files.
-   */
+  // Combine records from all uploaded CSV files into one array.
   const records = useMemo(() => {
     return uploadedFiles.flatMap((file) => {
       const fileRecords = Array.isArray(file.records)
@@ -81,15 +83,15 @@ function Dashboard() {
 
       return fileRecords.map((record) => ({
         ...record,
+        // Keep the source filename with every individual record.
         fileName: file.fileName,
       }));
     });
   }, [uploadedFiles]);
 
-  /*
-   * Calculate dashboard totals from real records.
-   */
+  // Calculate all totals and chart percentages from the real records.
   const summary = useMemo(() => {
+    // A record is valid only when isValid is explicitly true.
     const validRecords = records.filter(
       (record) => record.isValid === true
     );
@@ -108,6 +110,7 @@ function Dashboard() {
 
     const totalRecords = records.length;
 
+    // Avoid division by zero when the user has uploaded no records.
     const validPercentage =
       totalRecords > 0
         ? (validRecords.length / totalRecords) * 100
@@ -147,14 +150,14 @@ function Dashboard() {
     };
   }, [records, uploadedFiles]);
 
-  /*
-   * Search and display recent NIC records.
-   */
+  // Show the 10 newest records, or all matching records during a search.
   const filteredRecords = useMemo(() => {
+    // Ignore extra spaces and letter case in the search value.
     const searchValue = searchText
       .trim()
       .toLowerCase();
 
+    // Copy before reversing so the original records array is not changed.
     const recentRecords = [...records]
       .reverse()
       .slice(0, 10);
@@ -163,6 +166,7 @@ function Dashboard() {
       return recentRecords;
     }
 
+    // Match the typed value against any part of the NIC number.
     return records.filter((record) =>
       String(record.nic || "")
         .toLowerCase()
@@ -170,7 +174,9 @@ function Dashboard() {
     );
   }, [records, searchText]);
 
+  // Display the logout overlay, clear stored data, and return to login.
   const handleLogout = () => {
+    // Prevent multiple logout timers from being started.
     if (isLoggingOut) return;
 
     setIsLoggingOut(true);
@@ -179,6 +185,7 @@ function Dashboard() {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
 
+      // Remove private validation data from the current browser session.
       sessionStorage.removeItem(
         "nicValidationResult"
       );
@@ -189,6 +196,7 @@ function Dashboard() {
 
   return (
     <div className="dash-layout">
+      {/* Main navigation sidebar for desktop and mobile screens. */}
       <aside
         className={`dash-sidebar ${
           sidebarOpen ? "dash-sidebar-open" : ""
@@ -253,8 +261,10 @@ function Dashboard() {
         </button>
       </aside>
 
+      {/* Cover the page with a loading message while logout finishes. */}
       {isLoggingOut && <LogoutOverlay />}
 
+      {/* Clicking outside the mobile sidebar closes it. */}
       {sidebarOpen && (
         <div
           className="dash-overlay"
@@ -263,6 +273,7 @@ function Dashboard() {
       )}
 
       <div className="dash-main">
+        {/* Dashboard title and the currently logged-in user. */}
         <header className="dash-header">
           <div className="dash-header-left">
             <button
@@ -299,6 +310,7 @@ function Dashboard() {
         </header>
 
         <main className="dash-content">
+          {/* Welcome message and shortcut to upload new CSV files. */}
           <section className="dash-welcome">
             <div>
               <h2>
@@ -321,6 +333,7 @@ function Dashboard() {
             </button>
           </section>
 
+          {/* High-level totals calculated from the uploaded records. */}
           <section className="dash-stat-grid">
             <div className="dash-stat-card">
               <div className="dash-stat-icon dash-blue">
@@ -385,6 +398,7 @@ function Dashboard() {
             </div>
           </section>
 
+          {/* Gender and validation-percentage visualizations. */}
           <section className="dash-chart-grid">
             <div className="dash-panel">
               <div className="dash-panel-heading">
@@ -404,6 +418,7 @@ function Dashboard() {
                   </div>
 
                   <div className="dash-bar-track">
+                    {/* The percentage controls the length of the male bar. */}
                     <div
                       className="dash-bar-fill dash-male-bar"
                       style={{
@@ -420,6 +435,7 @@ function Dashboard() {
                   </div>
 
                   <div className="dash-bar-track">
+                    {/* The percentage controls the length of the female bar. */}
                     <div
                       className="dash-bar-fill dash-female-bar"
                       style={{
@@ -442,6 +458,7 @@ function Dashboard() {
               </div>
 
               <div className="dash-circle-area">
+                {/* A conic gradient draws the valid/invalid circle chart. */}
                 <div
                   className="dash-circle-chart"
                   style={{
@@ -482,6 +499,7 @@ function Dashboard() {
             </div>
           </section>
 
+          {/* Recent records table with optional NIC-number searching. */}
           <section className="dash-panel">
             <div className="dash-table-header">
               <div>
@@ -519,6 +537,7 @@ function Dashboard() {
                 </thead>
 
                 <tbody>
+                  {/* Display each recent record or search result as a row. */}
                   {filteredRecords.map(
                     (record, index) => (
                       <tr
@@ -555,6 +574,7 @@ function Dashboard() {
                     )
                   )}
 
+                  {/* Show guidance when no records match the current view. */}
                   {filteredRecords.length === 0 && (
                     <tr>
                       <td
