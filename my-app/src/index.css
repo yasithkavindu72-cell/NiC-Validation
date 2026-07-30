@@ -1,3 +1,7 @@
+/* =========================================================
+   GLOBAL RESET AND BASE STYLES
+   ========================================================= */
+
 * {
   margin: 0;
   padding: 0;
@@ -7,6 +11,10 @@
 body {
   font-family: Arial, sans-serif;
 }
+
+/* =========================================================
+   LOGIN PAGE
+   ========================================================= */
 
 .login-page {
   width: 100%;
@@ -356,12 +364,18 @@ body {
   }
 }
 
+/* Login page responsive styles. */
+
 @media (max-width: 500px) {
   .login-card {
     padding: 38px 24px 32px;
     border-radius: 20px;
   }
 }
+
+/* =========================================================
+   REGISTRATION PAGE
+   ========================================================= */
 
 .register-page {
   width: 100%;
@@ -546,7 +560,7 @@ body {
   text-decoration: underline;
 }
 
-/* Mobile */
+/* Registration page responsive styles. */
 
 @media (max-width: 500px) {
   .register-card {
@@ -561,9 +575,9 @@ body {
 
 
 
-/* =================================
-   DASHBOARD
-================================= */
+/* =========================================================
+   DASHBOARD LAYOUT AND SIDEBAR
+   ========================================================= */
 
 .dash-layout {
   min-height: 100vh;
@@ -1059,9 +1073,9 @@ body {
   display: none;
 }
 
-/* =================================
-   DASHBOARD RESPONSIVE
-================================= */
+/* =========================================================
+   DASHBOARD RESPONSIVE STYLES
+   ========================================================= */
 
 @media (max-width: 1100px) {
   .dash-stat-grid {
@@ -1142,6 +1156,10 @@ body {
 * {
   box-sizing: border-box;
 }
+
+/* =========================================================
+   CSV UPLOAD PAGE
+   ========================================================= */
 
 .upload-page {
   min-height: 100vh;
@@ -1652,6 +1670,8 @@ body {
   font-weight: 700;
 }
 
+/* Upload page responsive styles. */
+
 @media (max-width: 960px) {
   .upload-sidebar {
     width: 210px;
@@ -1760,6 +1780,10 @@ body {
   }
 }
 
+/* =========================================================
+   SHARED CONTENT WIDTHS WITH THE DASHBOARD SIDEBAR
+   ========================================================= */
+
 .upload-page .upload-main {
   width: calc(100% - 260px);
   margin-left: 260px;
@@ -1780,6 +1804,9 @@ body {
   }
 }
 
+/* =========================================================
+   NIC RECORDS PAGE
+   ========================================================= */
 
 .records-page {
   min-height: 100vh;
@@ -2035,6 +2062,9 @@ body {
   }
 }
 
+/* =========================================================
+   REPORTS PAGE
+   ========================================================= */
 
 .reports-page {
   min-height: 100vh;
@@ -2294,6 +2324,8 @@ body {
   cursor: pointer;
 }
 
+/* Reports page responsive styles. */
+
 @media (max-width: 1000px) {
   .reports-summary {
     grid-template-columns: repeat(2, 1fr);
@@ -2304,7 +2336,10 @@ body {
   }
 }
 
-/* Updated */
+/* =========================================================
+   SHARED HOVER AND PAGE-LOAD ANIMATIONS
+   ========================================================= */
+
 .login-card button, .register-button, .dash-primary-button {
   transition: all 0.3s ease;
 }
@@ -2345,7 +2380,10 @@ body {
   transition: transform 0.4s ease-in-out;
 }
 
-/* 3D login/register flip transition */
+/* =========================================================
+   LOGIN AND REGISTRATION 3D PAGE TRANSITIONS
+   ========================================================= */
+
 .login-page,
 .register-page {
   perspective: 1400px;
@@ -2441,7 +2479,10 @@ body {
   }
 }
 
-/* Shared dashboard header on Upload, NIC Records and Reports */
+/* =========================================================
+   SHARED TOP BAR: UPLOAD, NIC RECORDS, AND REPORTS
+   ========================================================= */
+
 .page-dashboard-topbar {
   min-height: 82px;
   margin: -32px -32px 30px;
