@@ -52,7 +52,7 @@ function NicRecords() {
         return records;
     }
   }, [records, filter]);
-
+///  ------------------- not Result--------------------------///
   if (!result) {
     return (
       <div className="dash-layout records-page">
@@ -79,7 +79,7 @@ function NicRecords() {
           >
             ☰
           </button>
-
+                  // validation  h1//
           <div>
             <h1>No validation results found</h1>
             <p>
