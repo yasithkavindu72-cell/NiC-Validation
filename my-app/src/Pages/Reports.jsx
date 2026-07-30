@@ -9,11 +9,13 @@ import DashboardTopbar from "../DashboardTopbar";
 
 
 function Reports() {
+  // React Router navigation and Reports page UI state.
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState("all");
   const [message, setMessage] = useState("");
 
+  // Read and parse the latest NIC validation result once.
   const validationResult = useMemo(() => {
     try {
       const storedResult = sessionStorage.getItem(
@@ -29,7 +31,9 @@ function Reports() {
     }
   }, []);
 
+  // Combine records from every uploaded CSV file into one array.
   const allRecords = useMemo(() => {
+    // Return an empty list safely when no files are available.
     if (!validationResult?.files) {
       return [];
     }
@@ -37,11 +41,13 @@ function Reports() {
     return validationResult.files.flatMap((file) =>
       (file.records || []).map((record) => ({
         ...record,
+        // Keep the source filename with every exported record.
         fileName: file.fileName,
       }))
     );
   }, [validationResult]);
 
+  // Create the filename options displayed in the report filter.
   const fileNames = useMemo(() => {
     if (!validationResult?.files) {
       return [];
@@ -52,6 +58,7 @@ function Reports() {
     );
   }, [validationResult]);
 
+  // Show all records or only records from the selected CSV file.
   const filteredRecords = useMemo(() => {
     if (selectedFile === "all") {
       return allRecords;
@@ -62,6 +69,7 @@ function Reports() {
     );
   }, [allRecords, selectedFile]);
 
+  // Recalculate the report totals whenever the selected records change.
   const summary = useMemo(() => {
     return {
       totalRecords: filteredRecords.length,
@@ -84,6 +92,7 @@ function Reports() {
     };
   }, [filteredRecords]);
 
+  // Convert each record into consistent columns shared by all exports.
   const getExportRows = () => {
     return filteredRecords.map((record) => ({
       File: record.fileName,
@@ -98,6 +107,7 @@ function Reports() {
     }));
   };
 
+  // Build a descriptive export filename with file selection and date.
   const createFileName = (extension) => {
     const date = new Date()
       .toISOString()
@@ -111,9 +121,11 @@ function Reports() {
     return `nic-validation-${filePart}-${date}.${extension}`;
   };
 
+  // Generate and download a comma-separated CSV report.
   const downloadCsv = () => {
     const rows = getExportRows();
 
+    // Stop when the current selection contains no records.
     if (rows.length === 0) {
       setMessage("There are no records to export.");
       return;
@@ -121,6 +133,7 @@ function Reports() {
 
     const headers = Object.keys(rows[0]);
 
+    // Escape double quotes so every value remains valid CSV.
     const escapeCsvValue = (value) => {
       return `"${String(value ?? "").replace(
         /"/g,
@@ -143,6 +156,7 @@ function Reports() {
       "\r\n"
     )}`;
 
+    // Create a temporary browser URL for the generated CSV data.
     const blob = new Blob([csvContent], {
       type: "text/csv;charset=utf-8;",
     });
@@ -159,11 +173,13 @@ function Reports() {
     link.click();
     document.body.removeChild(link);
 
+    // Release the temporary URL after the download starts.
     URL.revokeObjectURL(downloadUrl);
 
     setMessage("CSV report downloaded successfully.");
   };
 
+  // Generate an Excel workbook with Summary and NIC Records sheets.
   const downloadExcel = () => {
     const rows = getExportRows();
 
@@ -174,6 +190,7 @@ function Reports() {
 
     const workbook = XLSX.utils.book_new();
 
+    // Prepare the overview information for the first worksheet.
     const summaryData = [
       ["NIC Validation Report"],
       ["Generated", new Date().toLocaleString()],
@@ -197,6 +214,7 @@ function Reports() {
     const recordsSheet =
       XLSX.utils.json_to_sheet(rows);
 
+    // Set readable widths for the record worksheet columns.
     recordsSheet["!cols"] = [
       { wch: 22 },
       { wch: 8 },
@@ -229,6 +247,7 @@ function Reports() {
     setMessage("Excel report downloaded successfully.");
   };
 
+  // Generate a landscape PDF containing summary text and a record table.
   const downloadPdf = () => {
     const rows = getExportRows();
 
@@ -274,6 +293,7 @@ function Reports() {
       34
     );
 
+    // Draw a table that can continue across multiple PDF pages.
     autoTable(document, {
       startY: 40,
 
@@ -327,6 +347,7 @@ function Reports() {
     setMessage("PDF report downloaded successfully.");
   };
 
+  // Show an empty state when the user has not validated any files.
   if (!validationResult) {
     return (
       <div className="dash-layout reports-page">
@@ -335,6 +356,7 @@ function Reports() {
           onClose={() => setSidebarOpen(false)}
         />
 
+        {/* Close the mobile sidebar when the overlay is clicked. */}
         {sidebarOpen && (
           <div
             className="dash-overlay"
@@ -354,6 +376,7 @@ function Reports() {
             ☰
           </button>
 
+          {/* Explain why reports are unavailable and link to Upload. */}
           <div>
             <h1>No report data found</h1>
             <p>
@@ -376,6 +399,7 @@ function Reports() {
         onClose={() => setSidebarOpen(false)}
       />
 
+      {/* Close the mobile sidebar when the overlay is clicked. */}
       {sidebarOpen && (
         <div
           className="dash-overlay"
@@ -386,6 +410,7 @@ function Reports() {
       <main className="reports-main">
         <DashboardTopbar />
 
+        {/* Page title, mobile menu control, and new-upload action. */}
         <header className="reports-header">
           <button
             type="button"
@@ -413,6 +438,7 @@ function Reports() {
           </button>
         </header>
 
+        {/* Choose whether the report uses all files or one CSV file. */}
         <section className="reports-filter-card">
           <div>
             <label htmlFor="report-file">
@@ -423,6 +449,7 @@ function Reports() {
               id="report-file"
               value={selectedFile}
               onChange={(event) => {
+                // Apply the new filter and clear the previous status message.
                 setSelectedFile(event.target.value);
                 setMessage("");
               }}
@@ -447,6 +474,7 @@ function Reports() {
           </span>
         </section>
 
+        {/* Totals calculated from the currently selected records. */}
         <section className="reports-summary">
           <div>
             <strong>{summary.totalRecords}</strong>
@@ -474,6 +502,7 @@ function Reports() {
           </div>
         </section>
 
+        {/* Download actions for each supported report format. */}
         <section className="reports-downloads">
           <article>
             <div className="reports-format-icon">
@@ -536,12 +565,14 @@ function Reports() {
           </article>
         </section>
 
+        {/* Show export success messages or empty-selection warnings. */}
         {message && (
           <div className="reports-message">
             {message}
           </div>
         )}
 
+        {/* Preview the same records that will appear in the exports. */}
         <section className="reports-preview">
           <div>
             <h2>Report Preview</h2>
@@ -566,6 +597,7 @@ function Reports() {
               </thead>
 
               <tbody>
+                {/* Render one preview row for every selected record. */}
                 {filteredRecords.map(
                   (record, index) => (
                     <tr
