@@ -3,18 +3,23 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "./Pages/Slidebar";
 import DashboardTopbar from "./DashboardTopbar";
 
-
+// Backend API Gateway address used by the frontend upload request.
 const API_URL =
   import.meta.env.VITE_API_URL || "http://localhost:5000";
 
+// Rules used to validate files before sending them to the backend.
 const MAX_FILES = 4;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
+
+// The shared Sidebar replaces the older Upload-only sidebar.
 const shouldRenderOldUploadSidebar = false;
 
 function Upload() {
+  // Navigation helper and reference to the hidden file input.
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
+  // State for the sidebar, selected files, messages, and upload result.
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [files, setFiles] = useState([]);
   const [message, setMessage] = useState("");
@@ -22,11 +27,13 @@ function Upload() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadResult, setUploadResult] = useState(null);
 
+  // Show a success or error message in the upload page.
   const showMessage = (text, type = "error") => {
     setMessage(text);
     setMessageType(type);
   };
 
+  // Check that a selected file is CSV format and no larger than 5 MB.
   const validateFile = (file) => {
     const fileName = file.name.toLowerCase();
 
@@ -41,7 +48,9 @@ function Upload() {
     return null;
   };
 
+  // Add valid, non-duplicate files until all four positions are filled.
   const addFiles = (selectedFiles) => {
+    // Clear results from the previous file selection or upload.
     setMessage("");
     setUploadResult(null);
 
@@ -54,6 +63,7 @@ function Upload() {
     const combinedFiles = [...files];
 
     for (const file of incomingFiles) {
+      // Skip this file when its format or size is invalid.
       const validationError = validateFile(file);
 
       if (validationError) {
@@ -67,6 +77,7 @@ function Upload() {
           existingFile.size === file.size
       );
 
+      // Treat matching filename and size as the same selected file.
       if (isDuplicate) {
         showMessage("You have uploaded duplicate files.");
         continue;
@@ -80,6 +91,7 @@ function Upload() {
       combinedFiles.push(file);
     }
 
+    // Save the final checked list in React state.
     setFiles(combinedFiles);
 
     if (combinedFiles.length === MAX_FILES) {
@@ -90,6 +102,7 @@ function Upload() {
     }
   };
 
+  // Process files selected with the browser's file picker.
   const handleFileChange = (event) => {
     addFiles(event.target.files);
 
@@ -97,6 +110,7 @@ function Upload() {
     event.target.value = "";
   };
 
+  // Process files dropped into the drag-and-drop area.
   const handleDrop = (event) => {
     event.preventDefault();
     event.currentTarget.classList.remove("upload-drop-zone-active");
@@ -104,15 +118,18 @@ function Upload() {
     addFiles(event.dataTransfer.files);
   };
 
+  // Highlight the drop area while files are dragged over it.
   const handleDragOver = (event) => {
     event.preventDefault();
     event.currentTarget.classList.add("upload-drop-zone-active");
   };
 
+  // Remove the highlight when dragged files leave the drop area.
   const handleDragLeave = (event) => {
     event.currentTarget.classList.remove("upload-drop-zone-active");
   };
 
+  // Remove one file from its selected position.
   const removeFile = (indexToRemove) => {
     setFiles((currentFiles) =>
       currentFiles.filter((_, index) => index !== indexToRemove)
@@ -122,6 +139,7 @@ function Upload() {
     setUploadResult(null);
   };
 
+  // Remove every selected file and reset page feedback.
   const clearFiles = () => {
     setFiles([]);
     setMessage("");
@@ -129,18 +147,23 @@ function Upload() {
     setUploadResult(null);
   };
 
+  // Send the four CSV files from the frontend to the backend.
   const handleUpload = async () => {
+    // Stop before the API request if four files are not selected.
     if (files.length !== MAX_FILES) {
       showMessage("Please select exactly four CSV files.");
       return;
     }
 
+    // FormData sends the actual files as multipart/form-data.
     const formData = new FormData();
 
     files.forEach((file) => {
+      // "files" must match upload.array("files", 4) in the backend.
       formData.append("files", file);
     });
 
+    // Read the authentication token saved after login.
     const token = localStorage.getItem("token");
 
     try {
@@ -148,6 +171,7 @@ function Upload() {
       setMessage("");
       setUploadResult(null);
 
+      // POST the file data to the API Gateway /uploads endpoint.
       const response = await fetch(`${API_URL}/uploads`, {
         method: "POST",
         headers: token
@@ -161,6 +185,7 @@ function Upload() {
       const responseText = await response.text();
       let data;
 
+      // Convert the backend JSON response text into a JavaScript object.
       try {
         data = JSON.parse(responseText);
       } catch {
@@ -169,27 +194,30 @@ function Upload() {
         );
       }
 
+      // Turn a backend 4xx or 5xx response into a frontend error.
       if (!response.ok) {
         throw new Error(data.message || "CSV upload failed.");
       }
 
       setUploadResult(data);
 
-// Save results so the NIC Records page can read them.
-sessionStorage.setItem(
-  "nicValidationResult",
-  JSON.stringify(data)
-);
+      // Save results for Dashboard, NIC Records, and Reports pages.
+      sessionStorage.setItem(
+        "nicValidationResult",
+        JSON.stringify(data)
+      );
 
-showMessage(
-  data.message ||
-    "Four CSV files uploaded and validated successfully.",
-  "success"
-);
+      // Show the success message returned by the backend.
+      showMessage(
+        data.message ||
+          "Four CSV files uploaded and validated successfully.",
+        "success"
+      );
 
-// Open the NIC Records page.
-navigate("/records");
+      // Open NIC Records after the backend finishes successfully.
+      navigate("/records");
     } catch (error) {
+      // Handle connection errors and error messages from the backend.
       console.error("Upload error:", error);
 
       showMessage(
@@ -198,16 +226,19 @@ navigate("/records");
           : error.message || "CSV upload failed."
       );
     } finally {
+      // Re-enable upload controls whether the request succeeds or fails.
       setIsUploading(false);
     }
   };
 
+  // Clear login data and return the user to the login page.
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     navigate("/");
   };
 
+  // Convert a byte value into a readable bytes, KB, or MB label.
   const formatFileSize = (bytes) => {
     if (bytes < 1024) {
       return `${bytes} bytes`;
@@ -222,11 +253,13 @@ navigate("/records");
 
   return (
     <div className="dash-layout upload-page">
+      {/* Shared navigation sidebar. */}
       <Sidebar
         isOpen={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
       />
 
+      {/* Close the mobile sidebar when the overlay is clicked. */}
       {sidebarOpen && (
         <div
           className="dash-overlay"
@@ -234,6 +267,7 @@ navigate("/records");
         />
       )}
 
+      {/* Old sidebar is kept in code but is currently disabled. */}
       {shouldRenderOldUploadSidebar && (
       <aside className="upload-sidebar">
         <div className="upload-logo">
@@ -293,6 +327,7 @@ navigate("/records");
       <main className="upload-main">
         <DashboardTopbar />
 
+        {/* Page heading, mobile menu, and selected-file counter. */}
         <header className="upload-header">
           <button
             type="button"
@@ -321,7 +356,9 @@ navigate("/records");
           </div>
         </header>
 
+        {/* Main card containing requirements and upload controls. */}
         <section className="upload-card">
+          {/* Explain the file count, format, and size rules. */}
           <div className="upload-requirements">
             <div>
               <span className="requirement-number">4</span>
@@ -351,6 +388,7 @@ navigate("/records");
             </div>
           </div>
 
+          {/* Accept files by drag-and-drop or the hidden file input. */}
           <div
             className="upload-drop-zone"
             onDrop={handleDrop}
@@ -385,6 +423,7 @@ navigate("/records");
             </button>
           </div>
 
+          {/* Display frontend validation or backend response messages. */}
           {message && (
             <div
               className={`upload-message upload-message-${messageType}`}
@@ -393,6 +432,7 @@ navigate("/records");
             </div>
           )}
 
+          {/* Selected-file heading and clear-all control. */}
           <div className="upload-selected-header">
             <div>
               <h3>Selected Files</h3>
@@ -414,6 +454,7 @@ navigate("/records");
             )}
           </div>
 
+          {/* Render four positions so missing files are easy to see. */}
           <div className="upload-file-list">
             {Array.from({ length: MAX_FILES }).map((_, index) => {
               const file = files[index];
@@ -429,6 +470,7 @@ navigate("/records");
                     {index + 1}
                   </div>
 
+                  {/* Show file details or an empty-position message. */}
                   {file ? (
                     <>
                       <div className="upload-file-icon">CSV</div>
@@ -463,6 +505,7 @@ navigate("/records");
             })}
           </div>
 
+          {/* Cancel the operation or send all files to the backend. */}
           <div className="upload-actions">
             <button
               type="button"
@@ -488,6 +531,7 @@ navigate("/records");
           </div>
         </section>
 
+        {/* Display totals returned after a successful backend request. */}
         {uploadResult && (
           <section className="upload-result-card">
             <div className="upload-result-icon">✓</div>
