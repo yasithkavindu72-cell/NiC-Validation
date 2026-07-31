@@ -1,5 +1,6 @@
 const express = require("express");
 
+// Multer middleware checks file type/size and stores uploads in memory.
 const upload = require(
   "../Middleware/UploadMiddleware"
 );
@@ -18,10 +19,13 @@ const {
   removeStoredBatch,
 } = require("../Services/FileStorage");
 
+// Create the route collection mounted at /uploads by Server.js.
 const router = express.Router();
 
+// POST /uploads accepts and processes one batch of four CSV files.
 router.post(
   "/",
+  // Read a maximum of four files from the multipart field named "files".
   upload.array("files", 4),
   async (req, res, next) => {
     try {
@@ -40,6 +44,8 @@ router.post(
       const uploadedFileNames = req.files.map(
         (file) => file.originalname
       );
+
+      // Compare lowercase names to find duplicates in the current request.
       const uniqueFileNames = new Set(
         uploadedFileNames.map((fileName) => fileName.toLowerCase())
       );
@@ -51,6 +57,7 @@ router.post(
         });
       }
 
+      // Check whether any filename was already saved in an earlier upload.
       const existingFileNames = await findExistingFileNames(
         uploadedFileNames
       );
@@ -63,19 +70,21 @@ router.post(
         });
       }
 
-      // Read all four CSV files.
+      // Read and prepare all four CSV files at the same time.
       const parsedFiles = await Promise.all(
         req.files.map(async (file) => {
           const rows = await parseCsvBuffer(
             file.buffer
           );
 
+          // Reject files that contain no data rows.
           if (!Array.isArray(rows) || rows.length === 0) {
             throw new Error(
               `${file.originalname} is empty.`
             );
           }
 
+          // Find the NIC column even if the source uses an accepted variation.
           const nicColumn = findNicColumn(rows[0]);
 
           if (!nicColumn) {
@@ -105,12 +114,14 @@ router.post(
         })
       );
 
+      // Calculate the total number of CSV data rows in this batch.
       const totalRecords = parsedFiles.reduce(
         (total, file) =>
           total + file.rowCount,
         0
       );
 
+      // Normalize all non-empty NIC values before duplicate checking.
       const nicNumbers = parsedFiles
         .flatMap((file) => file.records)
         .map((record) => record.nic.trim().toUpperCase())
@@ -118,6 +129,7 @@ router.post(
       const seenNicNumbers = new Set();
       const duplicateNicNumbers = new Set();
 
+      // Find NIC values repeated across the four files in this request.
       nicNumbers.forEach((nicNumber) => {
         if (seenNicNumbers.has(nicNumber)) {
           duplicateNicNumbers.add(nicNumber);
@@ -126,6 +138,7 @@ router.post(
         seenNicNumbers.add(nicNumber);
       });
 
+      // Find NIC values that already exist in the database.
       const existingNicNumbers = await findExistingNicNumbers(
         [...seenNicNumbers]
       );
@@ -134,6 +147,7 @@ router.post(
         duplicateNicNumbers.add(String(nicNumber).toUpperCase());
       });
 
+      // Reject the entire batch if any duplicate NIC number was found.
       if (duplicateNicNumbers.size > 0) {
         return res.status(409).json({
           success: false,
@@ -148,6 +162,7 @@ router.post(
 
       let validationResponse;
 
+      // Send the parsed records to the separate NIC Validation Service.
       try {
         validationResponse = await fetch(
           `${validationServiceUrl}/validate/batch`,
@@ -172,6 +187,7 @@ router.post(
 
       let validationData;
 
+      // Convert the Validation Service response into a JavaScript object.
       try {
         validationData = JSON.parse(responseText);
       } catch {
@@ -180,6 +196,7 @@ router.post(
         );
       }
 
+      // Treat non-2xx responses from the Validation Service as upload errors.
       if (!validationResponse.ok) {
         throw new Error(
           validationData.message ||
@@ -187,19 +204,23 @@ router.post(
         );
       }
 
+      // Save the original CSV files on the server only after validation passes.
       const storedUpload = await saveFilesToServer(req.files);
       let batchId;
 
+      // Save validated records and their summary in the database.
       try {
         batchId = await saveValidatedUpload({
           validatedFiles: validationData.files,
           summary: validationData.summary,
         });
       } catch (error) {
+        // Roll back saved files if the database operation fails.
         await removeStoredBatch(storedUpload.batchDirectory);
         throw error;
       }
 
+      // Return everything the frontend needs for Records and Reports pages.
       return res.status(200).json({
         success: true,
         message:
@@ -215,6 +236,7 @@ router.post(
         files: validationData.files,
       });
     } catch (error) {
+      // Pass unexpected errors to the central Express error handler.
       next(error);
     }
   }
